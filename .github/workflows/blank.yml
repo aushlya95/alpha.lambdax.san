@@ -39,4 +39,4 @@ jobs:
           ssh-add ~/.ssh/id_rsa
 
           # Replace the placeholder command below with your actual deployment commands
-          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "sudo touch /tmp/santooz.html"
+          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "touch /tmp/santooz.html"
