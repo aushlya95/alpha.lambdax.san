@@ -43,5 +43,5 @@ jobs:
         if: ${{ env.BRANCH_NAME == 'alpha.lambdax.san' }}
         run: |
          
-          # ssh-keyscan -H ${{ env.EC2_HOSTNAME }} >> ~/.ssh/known_hosts
+      
           ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }}
