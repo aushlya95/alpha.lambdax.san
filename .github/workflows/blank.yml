@@ -24,7 +24,7 @@ jobs:
           if [[ $BRANCH_NAME == 'alpha.lambdax.san' ]]; then
             echo "EC2_HOSTNAME=ec2-3-84-30-29.compute-1.amazonaws.com" >> "$GITHUB_ENV"          
           fi
-          echo "EC2_USER=${EC2_USER}" >> "$GITHUB_ENV"
+          echo "EC2_USER=${ec2-user}" >> "$GITHUB_ENV"
 
       - name: Deploy to specified server alpha.lambdax.san
         if: startsWith(env.BRANCH_NAME, 'alpha.lambdax.san')
