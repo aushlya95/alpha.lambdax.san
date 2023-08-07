@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - alpha.lambdax.san
+      - playground.lambdax.ai
 
     paths-ignore:
       - '**.md'
@@ -22,21 +23,20 @@ jobs:
       - name: Set variables
         run: |
           if [[ $BRANCH_NAME == 'alpha.lambdax.san' ]]; then
-            echo "EC2_HOSTNAME=ec2-3-84-30-29.compute-1.amazonaws.com" >> "$GITHUB_ENV"          
+            echo "EC2_HOSTNAME=${{secrets.EC2_ALPHA_HOSTNAME}}" >> "$GITHUB_ENV"
+          elif [[ $BRANCH_NAME == 'playground.lambdax.ai' ]]; then
+            echo "EC2_HOSTNAME=${{secrets.EC2_PLAYGROUND_HOSTNAME}}" >> "$GITHUB_ENV"
           fi
-          echo "EC2_USER=$EC2_USER" >> "$GITHUB_ENV"
+          echo "EC2_USER=${EC2_USER}" >> "$GITHUB_ENV"
 
-      - name: Deploy to specified server alpha.lambdax.san
-        if: startsWith(env.BRANCH_NAME, 'alpha.lambdax.san')
+      - name: Deploy to specified server
+        if: startsWith(env.BRANCH_NAME, 'alpha.lambdax.san') || startsWith(env.BRANCH_NAME, 'playground.lambdax.ai')
         run: |
-    
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY_VERTEX}}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY_VERTEX }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
-      
-      - name: Log In to Container Registry on server ${{ env.EC2_HOSTNAME }}
-        if: ${{ env.BRANCH_NAME == 'alpha.lambdax.san' }}
-        run: |
+
+          # Replace the placeholder command below with your actual deployment commands
           ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "touch /tmp/santooz.html"
