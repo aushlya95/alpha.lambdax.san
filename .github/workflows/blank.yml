@@ -25,7 +25,7 @@ jobs:
           if [[ $BRANCH_NAME == 'alpha.lambdax.san' ]]; then
             echo "EC2_HOSTNAME=${EC2_ALPHA_HOSTNAME}" >> "$GITHUB_ENV"
           elif [[ $BRANCH_NAME == 'playground.lambdax.ai' ]]; then
-            echo "EC2_HOSTNAME=${EC2_PLAY_HOSTNAME}" >> "$GITHUB_ENV"
+            echo "EC2_HOSTNAME=${EC2_PLAYGROUND_HOSTNAME}" >> "$GITHUB_ENV"
           fi
           echo "EC2_USER=${EC2_USER}" >> "$GITHUB_ENV"
 
