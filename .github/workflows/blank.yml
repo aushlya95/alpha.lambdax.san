@@ -23,9 +23,9 @@ jobs:
       - name: Set variables
         run: |
           if [[ $BRANCH_NAME == 'alpha.lambdax.san' ]]; then
-            echo "EC2_HOSTNAME=${EC2_ALPHA_HOSTNAME}" >> "$GITHUB_ENV"
+            echo "EC2_ALPHA_HOSTNAME=${EC2_ALPHA_HOSTNAME}" >> "$GITHUB_ENV"
           elif [[ $BRANCH_NAME == 'playground.lambdax.ai' ]]; then
-            echo "EC2_HOSTNAME=${EC2_PLAYGROUND_HOSTNAME}" >> "$GITHUB_ENV"
+            echo "EC2_PLAYGROUND_HOSTNAME=${EC2_PLAYGROUND_HOSTNAME}" >> "$GITHUB_ENV"
           fi
       - name: Deploy to specified server
         if: startsWith(env.BRANCH_NAME, 'alpha.lambdax.san') || startsWith(env.BRANCH_NAME, 'playground.lambdax.ai')
@@ -36,4 +36,4 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
           # Replace the placeholder command below with your actual deployment commands
-          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "touch /tmp/santooz.html"
+          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_PLAYGROUND_HOSTNAME }} "touch /tmp/santooz.html"
