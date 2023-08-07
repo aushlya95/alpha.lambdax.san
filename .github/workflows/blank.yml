@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Set variables
         run: |
-          if [[ $BRANCH_NAME == 'alpha.lambdax.san']]; then
+          if [[ $BRANCH_NAME == 'alpha.lambdax.san']] then
             echo "EC2_HOSTNAME=ec2-18-204-213-193.compute-1.amazonaws.com" >> "$GITHUB_ENV"          
           fi
       
