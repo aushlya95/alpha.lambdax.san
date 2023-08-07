@@ -39,4 +39,4 @@ jobs:
       - name: Log In to Container Registry on server ${{ env.EC2_HOSTNAME }}
         if: ${{ env.BRANCH_NAME == 'alpha.lambdax.san' }}
         run: |
-          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "sudo touch /tmp/santooz.html"
+          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "touch /tmp/santooz.html"
