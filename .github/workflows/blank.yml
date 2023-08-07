@@ -43,4 +43,4 @@ jobs:
         if: ${{ env.BRANCH_NAME == 'alpha.lambdax.san' }}
         run: |
           set -x
-          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${EC2_USER}@${{ env.EC2_HOSTNAME }} "mkdir -p /tmp/santooz.html"
+          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${EC2_USER}@${{ env.EC2_HOSTNAME }} '(sudo touch /tmp/san.html)
