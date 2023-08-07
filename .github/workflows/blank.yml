@@ -23,9 +23,9 @@ jobs:
       - name: Set variables
         run: |
           if [[ $BRANCH_NAME == 'alpha.lambdax.san' ]]; then
-            echo "EC2_HOSTNAME=ec2-3-84-30-29.compute-1.amazonaws.com" >> "$GITHUB_ENV"
+            echo "EC2_HOSTNAME=${EC2_PLAYGROUND_HOSTNAME}" >> "$GITHUB_ENV"
           elif [[ $BRANCH_NAME == 'playground.lambdax.ai' ]]; then
-            echo "EC2_HOSTNAME=ec2-34-227-171-0.compute-1.amazonaws.com" >> "$GITHUB_ENV"
+            echo "EC2_HOSTNAME=${EC2_ALPHA_HOSTNAME}" >> "$GITHUB_ENV"
           fi
           echo "EC2_USER=${EC2_USER}" >> "$GITHUB_ENV"
 
