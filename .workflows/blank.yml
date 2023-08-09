@@ -1,0 +1,48 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - alpha.lambdax.san
+      - playground.lambdax.ai
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+env:
+  EC2_USER: ${{ secrets.EC2_USER }}
+  GIT_REPO_URL: "https://github.com/aushlya95/alpha.lambdax.san.git"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set variables
+        run: |
+          if [[ $GITHUB_REF =~ .*-alpha$ ]]; then
+            echo "EC2_HOSTNAME=${{ secrets.EC2_ALPHA_HOSTNAME }}" >> "$GITHUB_ENV"
+          elif [[ $GITHUB_REF =~ .*-playground$ ]]; then
+            echo "EC2_HOSTNAME=${{ secrets.EC2_PLAYGROUND_HOSTNAME }}" >> "$GITHUB_ENV"
+          else
+            echo "EC2_HOSTNAME=" >> "$GITHUB_ENV"
+          fi
+          echo "EC2_USER=${EC2_USER}" >> "$GITHUB_ENV"
+          echo "GIT_REPO_URL=${GIT_REPO_URL}" >> "$GITHUB_ENV"
+          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> "$GITHUB_ENV"
+
+      - name: Clone repository and deploy
+        if: env.EC2_HOSTNAME != ''
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY_VERTEX }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+
+          git clone $GIT_REPO_URL $BRANCH_NAME
+          cd $BRANCH_NAME
+          git checkout $BRANCH_NAME
+
+          # Replace the placeholder command below with your actual deployment commands
+          scp -o "StrictHostKeyChecking no" -r * ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }}:/tmp
