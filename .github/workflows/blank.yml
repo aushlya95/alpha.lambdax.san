@@ -31,14 +31,15 @@ jobs:
           echo "GIT_REPO_URL=${GIT_REPO_URL}" >> "$GITHUB_ENV"
           echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> "$GITHUB_ENV"
 
-      - name: Copy files to server
+      - name: SSH into server and copy files
         if: env.EC2_HOSTNAME != ''
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY_VERTEX }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
 
-          # Replace with your SCP command to copy files directly from the branch
-          scp -o "StrictHostKeyChecking no" -r $BRANCH_NAME/* ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }}:/tmp/
+          # SSH into the server
+          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "
+            git clone $GIT_REPO_URL /tmp/repo
+            cp -r /tmp/repo/$BRANCH_NAME/* /tmp/
+          "
