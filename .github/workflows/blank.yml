@@ -31,7 +31,7 @@ jobs:
           echo "GIT_REPO_URL=${GIT_REPO_URL}" >> "$GITHUB_ENV"
           echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> "$GITHUB_ENV"
 
-      - name: Clone repository and deploy
+      - name: Copy files to server
         if: env.EC2_HOSTNAME != ''
         run: |
           mkdir -p ~/.ssh
@@ -40,9 +40,5 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
 
-          git clone $GIT_REPO_URL $BRANCH_NAME
-          cd $BRANCH_NAME
-          git checkout $BRANCH_NAME
-
-          # Replace the placeholder command below with your actual deployment commands
-          scp -o "StrictHostKeyChecking no" -r * ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }}:/tmp
+          # Replace with your SCP command to copy files directly from the branch
+          scp -o "StrictHostKeyChecking no" -r $BRANCH_NAME/* ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }}:/tmp/
