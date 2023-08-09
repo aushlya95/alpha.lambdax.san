@@ -31,15 +31,3 @@ jobs:
           echo "GIT_REPO_URL=${GIT_REPO_URL}" >> "$GITHUB_ENV"
           echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> "$GITHUB_ENV"
 
-      - name: Clone repository and deploy
-        if: env.EC2_HOSTNAME != ''
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY_VERTEX }}" > ~/.ssh/id_rsa
-          chmod 400 ~/.ssh/id_rsa
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/id_rsa
-
-      
-          # Replace the placeholder command below with your actual deployment commands
-          scp -o "StrictHostKeyChecking no" -r * ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }}:/tmp
