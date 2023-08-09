@@ -37,9 +37,9 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY_VERTEX }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
 
-          # SSH into the server
-          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "
-            git clone $GIT_REPO_URL /tmp/repo
-            cp -r /tmp/repo/$BRANCH_NAME/* /tmp/
-          "
+          # Replace the placeholder command below with your actual deployment commands
+          ssh -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa ${{ env.EC2_USER }}@${{ env.EC2_HOSTNAME }} "touch /tmp/alpha_server1.html"
+         
