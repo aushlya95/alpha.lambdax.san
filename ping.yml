@@ -1,6 +1,13 @@
 ---
-- name: Ping Check
+- name: Get Hostname
   hosts: all
+  become: yes
+  become_user: ec2-user
   tasks:
-    - name: Ping the host
-      ping:
+    - name: Get hostname
+      command: hostname
+      register: hostname_output
+
+    - name: Display hostname
+      debug:
+        var: hostname_output.stdout
