@@ -1,8 +1,11 @@
 version: '3.3'
 
 services:
-  santooz-web1:  # Rename the service
-    image: nginx
+  santooz-web1:  # Rename the service if needed
+    build:
+      context: .  # Use the current directory as the build context
+      dockerfile: Dockerfile  # Specify the Dockerfile to use
+    image: santhosh/nginx  # Name the image
     volumes:
       - /tmp/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
