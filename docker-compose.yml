@@ -1,10 +1,119 @@
-version: '3.3'
-
+version: "3.8"
 services:
+  api:
+    build: .
+    container_name: cognitusclm_api
+    command:
+    - bash
+    - -c
+    - |
+      wait-for-it --service db:5432 --timeout=60
+      alembic upgrade head
+      uvicorn main:app --host 0.0.0.0 --port 80 --reload
+    ports:
+    - 8000:80
+    environment:
+      DB_HOST                  : ${DB_HOST}
+      DB_NAME                  : ${DB_NAME}
+      DB_USER                  : ${DB_USER}
+      DB_PASS                  : ${DB_PASS}
+      DB_URI                   : ${DB_URI}
+      SECRET                   : ${SECRET}
+      API_KEY                  : ${API_KEY}
+      PWD_DECRYPT_KEY          : ${PWD_DECRYPT_KEY}
+      AGREEMENT_DOC_BASE_URI   : ${AGREEMENT_DOC_BASE_URI}
+      REDIS_URI                : ${REDIS_URI}
+    volumes:
+    - ./cognitusclm:/app/cognitusclm
+    - ./alembic:/app/alembic
+    - ./data:/app/data
+    - ./logs:/app/logs
+    depends_on:
+    - db
+    - redis
+  
+  web:
+    image: localhost/lambdax-web:latest
+    container_name: lambdax_web
+    restart: always
+
+  pdf_extractor:
+    image: cognitusconsulting/pdf-extractor:playground-lambdax-ai
+    volumes:
+    - ./ocr_models:/root/.paddleocr
+
+  sap_service:
+    image: ghcr.io/contractsai/sap-service:latest
+    container_name: lambdax_sap_service
+    privileged: true
+    cap_add:
+    - NET_ADMIN
+
+  db:
+    image: postgres:15
+    container_name: cognitusclm_db
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_USER         : ${DB_USER}
+      POSTGRES_PASSWORD     : ${DB_PASS}
+      POSTGRES_DB           : ${DB_NAME}
+    volumes:
+    - ./db:/var/lib/postgresql/data
+
   nginx:
     image: nginx
     ports:
-      - "80:80"
+    - 80:80
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/index.html:/usr/share/nginx/html/index.html
+    - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+    - api
+    - web
+    - document_server
+    - file_server
+
+  master:
+    image: locustio/locust
+    ports:
+    - "8888:8089"
+    volumes:
+    - ./perf:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master -H http://localhost:8000
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    
+  worker:
+    image: locustio/locust
+    volumes:
+      - ./perf:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
+    deploy:
+      replicas: 10
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+  redis:
+    image: redis:7
+
+  document_server:
+    image: cognitusconsulting/lambdax_document_editor_office_server:sandbox.lambdax.ai
+    container_name: lambdax_document_editor_office_server
+    ports:
+    - 9981:80
+    environment:
+      JWT_ENABLED              : false
+    restart: always
+
+  file_server:
+    image: cognitusconsulting/lambdax_document_file_server:sandbox.lambdax.ai
+    container_name: lambdax_document_file_server
+    ports:
+    - 9980:80
+    volumes:
+    - ./document_server_files:/usr/src/app/files
+    environment:
+      PORT                 : 80
+      APP_URL              : http://192.168.220.200
+      DOCUMENT_SERVER_URL  : http://192.168.220.200/ds/
+      API_KEY              : someapikey
